@@ -1,0 +1,34 @@
+author: Mahi
+required_level: 0
+
+skill_defaults:
+  max_level: 10
+  level_interval: 2
+
+skills:
+
+  HeavyWeaponry:
+    passive: true
+    variables:
+      slow: 20
+
+  TitaniumBullets:
+    variables:
+      damage:
+        per_level: 3
+
+  SteelArmor:
+    variables:
+      health:
+        per_level: 15
+      blocks: [6, 6, 6, 5, 5, 5, 4, 4, 4, 3]
+  
+  RocketBoosters:
+    required_level: 8
+    max_level: 6
+    level_interval: 3
+    variables:
+      cooldown:
+        base: 8
+        per_level: -1
+      off_cooldown: 2

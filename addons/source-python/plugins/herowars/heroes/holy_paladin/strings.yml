@@ -1,0 +1,67 @@
+name:
+  en: Holy Paladin
+  fi: Pyhä Temppeliritari
+
+description:
+  en: Holy warrior with divine abilities.
+  fi: Pyhä soturi taivaallisilla voimilla.
+
+skills:
+
+  Condemn:
+    name:
+      en: Condemn
+      fi: Tuomita
+    description:
+      en: "{chance} % chance to freeze for {duration} seconds with attacks."
+      fi: "{chance} % mahdollisuus jäädyttää iskuilla {duration} sekuniksi."
+    victim_message:
+      en: You were frozen for {duration} seconds
+      fi: Sinut jäädytettiin {duration} sekuniksi
+
+  SaintsCloak:
+    name:
+      en: Saint's Cloack
+      fi: Pyhimyksen Viitta
+    description:
+      en: Spawn with {health} extra health and {invis} % invisibility.
+      fi: Synny {health} lisä-elämäpisteellä ja {invis} % näkymättömyydellä.
+    message:
+      en: Spawned with {health} extra health and {invis} % invisibility
+      fi: Synnyit {health} lisä-elämäpisteellä ja {invis} % näkymättömyydellä
+
+  MartyrDeath:
+    name:
+      en: Martyr Death
+      fi: Martyyrin Kuolema
+    description:
+      en: |-
+        When you're killed, heal your teammates for {heal} and
+        damage your killer for {damage} health.
+      fi: |-
+        Kuollessassi parannat tiimiläisiäsi {heal} ja
+        vahingoita tappajaasi {damage} elämäpisteellä.
+    user_message:
+      en: You gave {heal} health to your team and damaged {name} for {damage} damage
+      fi: Annoit {heal} elämäpistettä tiimillesi ja teit {damage} vahinkoa henkilöön {name} 
+    teammate_message:
+      en: You were granted {heal} HP
+      fi: Sinulle annettiin {heal} elämäpistettä
+    killer_message:
+      en: You were damaged for {damage} for killing {name}
+      fi: Menetit {damage} elämäpistettä henkilön {name} taposta
+
+
+  GodMode:
+    name:
+      en: God Mode
+      fi: Jumala Muoto
+    description:
+      en: Become invulnerable for {duration} seconds.
+      fi: Muutu vahingoittumattomaksi {duration} sekunin ajaksi.
+    start_message:
+      en: You are invulnerable for {duration} seconds
+      fi: Olet vahingoittumaton {duration} sekuntia
+    end_message:
+      en: You are mortal again
+      fi: Olet taas kuolevainen

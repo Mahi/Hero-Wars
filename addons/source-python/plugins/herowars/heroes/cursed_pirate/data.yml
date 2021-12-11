@@ -1,0 +1,66 @@
+author: Mahi
+required_level: 0
+
+skills:
+
+  Plunder:
+    variables:
+      chance: 20
+      money:
+        per_level: 5
+      lifesteal:
+        base: 10
+        per_level: 2.5
+    effects:
+      beam:
+        model: 'sprites/laserbeam.vmt'
+        temp_entity: 'BeamPoints'
+        red: 255
+        green: 200
+        blue: 0
+        alpha: 255
+        life_time: 1.0
+        start_width: 1
+        end_width: 1
+        frame_rate: 30
+        speed: 1
+
+  RaiseTheSails:
+    variables:
+      speed:
+        per_level: 5
+  
+  Loot:
+    variables:
+      hegrenade_chance:
+        per_level: 8
+      flashbang_chance:
+        per_level: 3
+      smokegrenade_chance:
+        per_level: 5
+      molotov_chance:
+        per_level: 10
+
+  FinalCurse:
+    required_level: 8
+    max_level: 6
+    level_interval: 3
+    variables:
+      duration:
+        base: 1
+        per_level: 0.25
+    effects:
+      ring:
+        model: 'sprites/laserbeam.vmt'
+        temp_entity: 'BeamRingPoint'
+        red: 255
+        green: 0
+        blue: 0
+        start_radius: 1
+        end_radius: 600
+        life_time: 3
+        start_width: 5
+        end_width: 5
+        amplitude: 2
+        frame_rate: 30
+        speed: 1

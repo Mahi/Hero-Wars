@@ -1,0 +1,35 @@
+author: Mahi
+required_level: 10
+
+skills:
+
+  TraditionalTools:
+    passive: true
+
+  SharpBlade:
+    variables:
+      damage:
+        per_level: 15
+
+  Leap:
+    variables:
+      longjump:
+        base: 10
+        per_level: 5
+
+  Meditation:
+    variables:
+      heal: 5
+      interval:
+        base: 5.5
+        per_level: -0.5
+
+  TotalVanish:
+    required_level: 8
+    max_level: 6
+    level_interval: 3
+    variables:
+      cooldown:
+        base: 30
+        per_level: -5
+      duration: [4, 8, 12, 16, 20, 24]

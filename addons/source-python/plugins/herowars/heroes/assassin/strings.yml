@@ -1,0 +1,56 @@
+name:
+  en: Assassin
+  fi: Salamurhaaja
+
+description:
+  en: Silent but deadly blade wielder.
+  fi: Hiljainen mutta kuolettava veitsen käyttäjä.
+
+skills:
+
+  TraditionalTools:
+    name:
+      en: Traditional Tools
+      fi: Perinteiset Työkalut
+    description:
+      en: You can only use a knife.
+      fi: Voit käyttää vain puukkoa.
+
+  SharpBlade:
+    name:
+      en: Sharp Blade
+      fi: Terävä Terä
+    description:
+      en: Your knife deals {damage} extra damage.
+      fi: Puukkosi tekee {damage} enemmän vahinkoa.
+
+  Leap:
+    name:
+      en: Leap
+      fi: Loikka
+    description:
+      en: Leap further with your jumps.
+      fi: Lennä pidemmälle hypyilläsi.
+    spawn_message:
+      en: Your jumps travel {longjump} % extra distance
+      fi: Hyppysi kulkevat {longjump} % lisämatkaa
+
+  Meditation:
+    name:
+      en: Meditation
+      fi: Meditaatio
+    description:
+      en: Regenerate {heal} health every {interval} seconds.
+      fi: Palauta {heal} elämäpistettä joka {interval} sekunti.
+
+  TotalVanish:
+    name:
+      en: Total Vanish
+      fi: Täydellinen Katoaminen
+    description:
+      en: |-
+        You become completely invisible for {duration} seconds,
+        but you are unable to move. Recast to end prematurely.
+      fi: |-
+        Muutut täysin näkymättömäksi {duration} sekuniksi, mutta
+        et voi liikkua. Aktivoi uudestaan lopettaaksesi etuajassa.

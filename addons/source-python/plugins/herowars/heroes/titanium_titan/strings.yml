@@ -1,0 +1,64 @@
+name:
+  en: Titanium Titan
+  fi: Titaani Titaani
+
+description:
+  en: Titanium covered titan. Very strong but slow.
+  fi: Titaanilla päällystetty titaani. Erittäin vahva mutta hidas.
+
+skills:
+
+  HeavyWeaponry:
+    name:
+      en: Heavy Weaponry
+      fi: Raskas Aseistus
+    description:
+      en: |-
+        You can only buy Deagle and M249.
+        You move {slow} % slower than usual.
+      fi: |-
+        Voit ostaa vain Deaglen ja M249.
+        Liikut {slow} % tavallista hitaammin.
+    message:
+      en: You move {slow} % slower and can only use Deagle or M249
+      fi: Liikut {slow} % hitaammin ja voit ostaa vain Deagle:n tai M249:n
+
+  TitaniumBullets:
+    name:
+      en: Titanium Bullets
+      fi: Titaaniluodit
+    description:
+      en: Deal {damage} % extra damage with your attacks.
+      fi: Tee {damage} % lisää vahinkoa iskuillasi.
+    message:
+      en: You did {damage} extra damage
+      fi: Teit {damage} lisävahinkoa
+
+  SteelArmor:
+    name:
+      en: Steel Armor
+      fi: Teräs Panssari
+    description:
+      en: |-
+        Spawn with {health} extra health
+        and block every {blocks} attacks.
+      fi: |-
+        Synny {health}:llä lisä-elämäpisteellä
+        ja torju joka {blocks}. hyökkäys.
+    spawn_message:
+      en: You got {health} extra health
+      fi: Sait {health} lisä-elämäpistettä
+    block_message:
+      en: You blocked a bullet for {damage} damage
+      fi: Torjuit luodin ja vältit {damage} vahinkoa
+
+  RocketBoosters:
+    name:
+      en: Rocket Boosters
+      fi: Rakettimoottorit
+    description:
+      en: Fly.
+      fi: Lennä.
+    end_message:
+      en: Run.
+      fi: Juokse.

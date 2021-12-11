@@ -1,0 +1,70 @@
+name:
+  en: Cursed Pirate
+  fi: Kirottu Piraatti
+
+descripton:
+  en: A pirate taken over by an evil curse.
+  fi: Ilkeän kirouksen valloittama piraatti.
+
+skills:
+
+  Plunder:
+    name:
+      en: Plunder
+      fi: Ryöväys
+    description:
+      en: |-
+        Attacks have {chance} % chance to steal
+        {money} money and {lifesteal} health.
+      fi: |-
+        Iskuillasi on {chance} % mahdollisuus ryövätä
+        {money} rahaa ja {lifesteal} elämäpistettä.
+    attacker_message:
+      en: You robbed {money} money and {health} health
+      fi: Ryöväsit {money} rahaa ja {health} elämäpistettä
+    victim_message:
+      en: You were robbed {money} money
+      fi: Sinulta ryövättiin {money} rahaa
+
+  RaiseTheSails:
+    name:
+      en: Raise the Sails
+      fi: Nosta Purjeet
+    description:
+      en: Gain {speed} % extra movement speed.
+      fi: Saa {speed} % lisää juoksunopeutta.
+    message:
+      en: You got {speed} % extra movement speed
+      fi: Sait {speed} % lisää juoksunopeutta
+
+  Loot:
+    name:
+      en: Loot
+      fi: Ryöstösaalis
+    description:
+      en: Spawn with additional utility.
+      fi: Synny ylimääräisten kranaattien kanssa.
+    message:
+      en: "You spawned with: {items}"
+      fi: "Sait syntyessä: {items}"
+
+  FinalCurse:
+    name:
+      en: Final Curse
+      fi: Viimeinen Kirous
+    description:
+      en: |-
+        Delay your death for {duration} seconds.
+        Kill someone during this time to survive with 1 HP.
+      fi: |-
+        Viivästytä kuolemaasi {duration} sekuntia.
+        Tapa joku tänä aikana, niin selviät 1:llä elämäpisteellä.
+    start_message:
+      en: Your curse has activated, rush to kill someone!!!
+      fi: Sinun kirouksesi on aktiovitunut, kiirehdi tappamaan joku!!!
+    success_message:
+      en: You survived by killing someone during your curse
+      fi: Selvisit tappamalla jonku kirouksesi aikana
+    fail_message:
+      en: You died to your curse...
+      fi: Kuolit kiroukseesi...

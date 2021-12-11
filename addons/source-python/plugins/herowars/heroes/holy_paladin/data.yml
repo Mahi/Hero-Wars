@@ -1,0 +1,64 @@
+author: Mahi
+required_level: 0
+
+skills:
+
+  Condemn:
+    variables:
+      chance:
+        base: 15
+        per_level: 2
+      duration:
+        base: 0.5
+        per_level: 0.1
+    effects:
+      beam:
+        model: 'sprites/laserbeam.vmt'
+        temp_entity: 'BeamPoints'
+        red: 0
+        green: 100
+        blue: 255
+        alpha: 150
+        start_width: 1
+        end_width: 1
+        frame_rate: 30
+        speed: 1
+      freeze:
+        model: 'sprites/laserbeam.vmt'
+        temp_entity: 'BeamPoints'
+        red: 0
+        green: 100
+        blue: 255
+        alpha: 255
+        start_width: 10
+        end_width: 10
+        frame_rate: 30
+        speed: 5
+
+  SaintsCloak:
+    variables:
+      health:
+        per_level: 5
+      invis:
+        base: 25
+        per_level: 3
+
+  MartyrDeath:
+    variables:
+      heal:
+        per_level: 2
+      damage:
+        base: 10
+        per_level: 2.5
+
+  GodMode:
+    required_level: 8
+    max_level: 6
+    level_interval: 3
+    variables:
+      cooldown:
+        base: 32
+        per_level: -1
+      duration:
+        base: 1.5
+        per_level: 0.25
