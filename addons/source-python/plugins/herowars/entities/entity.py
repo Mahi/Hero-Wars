@@ -40,3 +40,6 @@ class Entity:
         if value > self.max_level:
             raise ValueError('level must not exceed max_level')
         self._level = value
+
+    def __repr__(self) -> str:
+        return f'{type(self).__name__}(name={self.name["en"]}, level={self.level}, db_id={self._db_id})'

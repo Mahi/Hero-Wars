@@ -147,7 +147,8 @@ class DatabaseSystem(System):
                 ])
             )
             last_id = skills_result.inserted_primary_key[0]
-            ids = range(last_id - len(skills), last_id + 1)
+            first_id = last_id - len(skills) + 1
+            ids = range(first_id, last_id + 1)
             for skill, skill_id in zip(skills, ids):
                 skill._db_id = skill_id
 
@@ -161,7 +162,7 @@ class DatabaseSystem(System):
                 )
             )
             conn.execute(
-                self.skills.update().where(self.skills.c.id==bindparam('id_')),
+                self.skills.update().where(self.skills.c.id==bindparam('id_')).values(level=bindparam('level')),
                 [
                     {
                         'level': skill.level,
