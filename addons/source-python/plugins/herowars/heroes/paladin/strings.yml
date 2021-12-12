@@ -1,6 +1,6 @@
 name:
-  en: Holy Paladin
-  fi: Pyhä Temppeliritari
+  en: Paladin
+  fi: Temppeliritari
 
 description:
   en: Holy warrior with divine abilities.
@@ -11,7 +11,7 @@ skills:
   Condemn:
     name:
       en: Condemn
-      fi: Tuomita
+      fi: Tuomio
     description:
       en: "{chance} % chance to freeze for {duration} seconds with attacks."
       fi: "{chance} % mahdollisuus jäädyttää iskuilla {duration} sekuniksi."
@@ -30,10 +30,10 @@ skills:
       en: Spawned with {health} extra health and {invis} % invisibility
       fi: Synnyit {health} lisä-elämäpisteellä ja {invis} % näkymättömyydellä
 
-  MartyrDeath:
+  Martyr:
     name:
-      en: Martyr Death
-      fi: Martyyrin Kuolema
+      en: Martyr
+      fi: Martyyri
     description:
       en: |-
         When you're killed, heal your teammates for {heal} and
@@ -50,7 +50,6 @@ skills:
     killer_message:
       en: You were damaged for {damage} for killing {name}
       fi: Menetit {damage} elämäpistettä henkilön {name} taposta
-
 
   GodMode:
     name:

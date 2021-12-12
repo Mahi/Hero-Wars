@@ -7,6 +7,7 @@ from herowars.utils import chance
 
 _up = Vector(0, 0, 32)
 
+
 class Condemn:
 
     def player_attack(skill, player, victim, **rest):
@@ -28,7 +29,7 @@ class SaintsCloak:
         player.color = player.color.with_alpha(int(alpha))
 
 
-class MartyrDeath:
+class Martyr:
 
     def player_death(skill, player, attacker, **rest):
         damage = int(skill.current('damage'))

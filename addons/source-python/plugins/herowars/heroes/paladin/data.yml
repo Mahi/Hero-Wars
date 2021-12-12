@@ -43,7 +43,7 @@ skills:
         base: 25
         per_level: 3
 
-  MartyrDeath:
+  Martyr:
     variables:
       heal:
         per_level: 2
