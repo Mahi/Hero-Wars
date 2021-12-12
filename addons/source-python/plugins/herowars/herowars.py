@@ -13,10 +13,8 @@ from entities.hooks import EntityPreHook
 from events import Event as SpEvent, GameEvent
 from events.manager import event_manager
 from memory import make_object
-from messages.base import SayText2
 from messages.colors.saytext2 import WHITE, GREEN, ORANGE
 from players.dictionary import PlayerDictionary
-from translations.strings import TranslationStrings
 
 # Hero-Wars imports
 from . import strings
@@ -96,7 +94,7 @@ class HeroWars:
         event_args = game_event.variables.as_dict()
         try:
             attacker = self.state.players.from_userid(event_args.pop('attacker'))
-        except ValueError:
+        except KeyError:
             attacker = None
         victim = self.state.players.from_userid(event_args.pop('userid'))
         event_args.update(attacker=attacker, victim=victim)
@@ -247,6 +245,7 @@ def _trigger_pre_damage_skills(args):
 @SpEvent('player_spawn')
 def on_spawn(event):
     player = hw.state.players.from_userid(event['userid'])
+
     hero = player.hero
     player.chat(strings.hero_info,
         name=hero.name,
