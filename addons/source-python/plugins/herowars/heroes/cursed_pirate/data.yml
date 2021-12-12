@@ -54,13 +54,15 @@ skills:
         model: 'sprites/laserbeam.vmt'
         temp_entity: 'BeamRingPoint'
         red: 255
-        green: 0
-        blue: 0
-        start_radius: 1
-        end_radius: 600
-        life_time: 3
-        start_width: 5
-        end_width: 5
-        amplitude: 2
+        green: 100
+        blue: 100
+        alpha: 100
+        start_radius: 10
+        end_radius: 60
+        life_time: 1
+        start_width: 40
+        end_width: 40
+        amplitude: 10
         frame_rate: 30
-        speed: 1
+        fade_length: 6
+        speed: 30

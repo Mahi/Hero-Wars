@@ -17,7 +17,7 @@ class Plunder:
             health = int(dmg_health * skill.current('lifesteal') // 100)
             player.health += health
 
-            skill.effect('beam', start_point=player.eye_location, end_point=victim.eye_location)
+            skill.effect('beam', start_point=player.eye_location, end_point=victim.chest_location)
             skill.chat(player, 'attacker_message', money=money, health=health)
             skill.chat(victim, 'victim_message', money=money)
 
@@ -69,7 +69,7 @@ class FinalCurse:
             player.color = Color(255, 150, 150)
             Delay(skill.current('duration'), FinalCurse._end_curse, (player, attacker.index, skill, godmode))
 
-            #skill.effect('ring', center=player.origin)
+            skill.effect('ring', center=player.stomach_location)
             skill.chat(player, 'start_message')
 
     def player_kill(player, skill, **eargs):
