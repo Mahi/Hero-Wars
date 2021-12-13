@@ -14,6 +14,11 @@ from .players import player_dict
 
 # Messages and data management
 
+def unload():
+    for player in player_dict.values():
+        database.save_player_data(player)
+
+
 @events.on('player_change_hero')
 def _on_player_change_hero(player, new_hero, old_hero, **eargs):
     if not player.dead:
