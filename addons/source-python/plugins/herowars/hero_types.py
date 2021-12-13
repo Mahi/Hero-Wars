@@ -38,14 +38,14 @@ def _build_hero_types(root: Path) -> Dict[str, HeroType]:
 
 def _build_hero_type(path: Path) -> HeroType:
     # Load data.yml
-    with open(path / 'data.yml') as data_file:
+    with open(path / 'data.yml', encoding='utf-8') as data_file:
         hero_data = yaml.safe_load(data_file)
 
     # Load code.py
     code_module = import_module(f'herowars.heroes.{path.name}.code')
 
     # Load strings.yml
-    with open(path / 'strings.yml') as strings_file:
+    with open(path / 'strings.yml', encoding='utf-8') as strings_file:
         strings = yaml.safe_load(strings_file)
 
     # Separate skills's data from hero's data

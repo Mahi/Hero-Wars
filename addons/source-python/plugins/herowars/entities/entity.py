@@ -5,11 +5,10 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 from effects.base import TempEntity
 from messages.colors.saytext2 import GREEN, ORANGE, WHITE
 from messages import SayText2
-from players.entity import Player
 from translations.strings import TranslationStrings
 
 # Hero-Wars imports
-from ..utils import CooldownDict
+from ..utils import CooldownDict, create_translation_string
 from .type_objects import EntityType
 
 
@@ -103,17 +102,16 @@ class Entity:
             self._cooldowns[key] = self.current(key)
         return value
 
-    def send_message(self, player_index: int, string: Union[TranslationStrings, str], **tokens: Dict[str, Any]):
-        if isinstance(string, TranslationStrings):
-            color_tokens = {
-                key: f'{ORANGE}{value}{WHITE}'
-                for key, value in tokens.items()
-            }
-            string = string.tokenized(**color_tokens)
-        elif tokens:
-            string = string.format(**tokens)
-
-        SayText2(f'[{GREEN}{{name}}{WHITE}] {{message}}').send(player_index, name=self.name, message=string)
+    def send_message(self, player_index: int, string: TranslationStrings, **tokens: Dict[str, Any]):
+        color_tokens = {
+            key: f'{ORANGE}{value}{WHITE}'
+            for key, value in tokens.items()
+        }
+        SayText2(create_translation_string(
+            f'[{GREEN}{{name}}{WHITE}] {{message}}',
+            name=self.name,
+            message=string.tokenized(**color_tokens),
+        )).send(player_index)
 
     def send_string(self, player_index: int, key: str, **tokens: Dict[str, Any]):
         self.send_message(player_index, self.strings[key], **tokens)
