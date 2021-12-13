@@ -43,3 +43,7 @@ class Entity:
 
     def __repr__(self) -> str:
         return f'{type(self).__name__}(name={self.name["en"]}, level={self.level}, db_id={self._db_id})'
+
+    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
+        if key in self.type_object.event_callbacks:
+            self.type_object.event_callbacks[key](**args)

@@ -5,8 +5,6 @@ from mathlib import Vector
 
 from herowars.utils import chance
 
-_up = Vector(0, 0, 32)
-
 
 class Condemn:
 
@@ -15,8 +13,8 @@ class Condemn:
             duration = skill.current('duration')
             victim.freeze(duration)
             skill.chat(victim, 'victim_message', duration=duration)
-            skill.effect('beam', start_point=player.origin + _up, end_point=victim.origin + _up, life_time=duration)
-            skill.effect('freeze', start_point=victim.origin, end_point=victim.eye_location + _up, life_time=duration)
+            skill.effect('beam', start_point=player.hip_location, end_point=victim.hip_location, life_time=duration)
+            skill.effect('freeze', start_point=victim.origin, end_point=victim.eye_location, life_time=duration)
 
 
 class SaintsCloak:

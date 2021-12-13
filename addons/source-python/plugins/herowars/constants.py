@@ -20,8 +20,8 @@ CUSTOM_PLAYER_EVENTS = {
 }
 
 DUO_PLAYER_EVENTS = {
-    'player_death': ('player_death', 'player_kill', 'player_suicide'),
-    'player_hurt': ('player_victim', 'player_attack', 'player_selfharm'),
+    'player_death': ('player_death', 'player_kill'),
+    'player_hurt': ('player_victim', 'player_attack'),
 }
 
 ALL_EVENTS = SOLO_PLAYER_EVENTS | CUSTOM_PLAYER_EVENTS | set(flatten(DUO_PLAYER_EVENTS.values()))

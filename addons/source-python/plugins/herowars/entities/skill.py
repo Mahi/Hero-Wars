@@ -38,6 +38,11 @@ class Skill(Entity):
             for variable in self.variables.keys()
         })
 
+    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
+        args['skill'] = self
+        if self.level > 0 or self.passive:
+            super().invoke_callbacks(key, args)
+
     def current(self, key: str) -> Any:
         raw = self.variables[key]
         if isinstance(raw, dict):
@@ -73,11 +78,6 @@ class Skill(Entity):
         for name, attr in kwargs.items():
             setattr(temp_entity, name, attr)
         temp_entity.create(*recipients)
-
-    def trigger(self, key: str, args: Dict[str, Any]):
-        callback = self.type_object.event_callbacks.get(key)
-        if callback is not None:
-            callback(skill=self, **args)
 
     def message(self, player: Player, string: TranslationStrings, **tokens: Dict[str, Any]):
         color_tokens = {

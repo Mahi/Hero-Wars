@@ -11,12 +11,12 @@ import yaml
 from path import Path
 
 # Hero-Wars imports
-from .constants import ALL_EVENTS
+from .constants import ALL_EVENTS, HEROES_PATH
 from .entities.type_objects import HeroType, SkillType
 from .utils import dicts_to_translation_strings
 
 
-def build_callbacks(obj: Any) -> Tuple[Callable, Callable]:
+def _build_callbacks(obj: Any) -> Tuple[Callable, Callable]:
     init_callback = None
     event_callbacks = {}
     for name, attr in vars(obj).items():
@@ -27,16 +27,16 @@ def build_callbacks(obj: Any) -> Tuple[Callable, Callable]:
     return init_callback, event_callbacks
 
 
-def build_hero_types(root: Path) -> Dict[str, HeroType]:
+def _build_hero_types(root: Path) -> Dict[str, HeroType]:
     hero_types = []
     for path in root.dirs():
-        hero_type = build_hero_type(path)
+        hero_type = _build_hero_type(path)
         hero_types.append(hero_type)
     hero_types.sort(key=lambda hero: hero.required_level)
     return OrderedDict((hero_type.key, hero_type) for hero_type in hero_types)
 
 
-def build_hero_type(path: Path) -> HeroType:
+def _build_hero_type(path: Path) -> HeroType:
     # Load data.yml
     with open(path / 'data.yml') as data_file:
         hero_data = yaml.safe_load(data_file)
@@ -67,7 +67,7 @@ def build_hero_type(path: Path) -> HeroType:
             if isinstance(attr, type) and attr.__module__ == code_module.__name__ and not name.startswith('_'):
                 print(f'Skipping class {path.name}.{name}, missing record in strings.py')
             continue
-        skill_init, skill_events = build_callbacks(attr)
+        skill_init, skill_events = _build_callbacks(attr)
         skill_data = {**skill_defaults, **skills_data.get(name, {})}
         skill_types.append(SkillType(
             key=skill_data.pop('key', f'{path.name}.{name}'),
@@ -82,7 +82,7 @@ def build_hero_type(path: Path) -> HeroType:
     # Create HeroType
     if 'key' not in hero_data:
         hero_data['key'] = path.name
-    hero_init, hero_events = build_callbacks(code_module)
+    hero_init, hero_events = _build_callbacks(code_module)
     return HeroType(
         strings=hero_translations,
         skill_types=skill_types,
@@ -90,3 +90,6 @@ def build_hero_type(path: Path) -> HeroType:
         event_callbacks=hero_events,
         **hero_data,
     )
+
+
+hero_types: Dict[str, HeroType] = _build_hero_types(HEROES_PATH)

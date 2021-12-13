@@ -13,10 +13,10 @@ class Hero(Entity):
     def __init__(self, *args, xp: int=0, **kwargs):
         super().__init__(*args, **kwargs)
         self._xp = xp
-        self.skills = self._create_skills()
+        self.skills = []
 
     def _create_skills(self) -> List[Skill]:
-        return [Skill(skill_type) for skill_type in self.type_object.skill_types]
+        self.skills.extend([Skill(skill_type) for skill_type in self.type_object.skill_types])
 
     @property
     def required_xp(self) -> int:
@@ -51,6 +51,12 @@ class Hero(Entity):
         if self.xp >= self.required_xp:
             self._xp = 0
 
+    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
+        args['hero'] = self
+        super().invoke_callbacks(key, args)
+        for skill in self.skills:
+            skill.invoke_callbacks(key, args)
+
     @property
     def skill_points(self) -> int:
         used_points = sum(skill.level for skill in self.skills)
@@ -71,8 +77,3 @@ class Hero(Entity):
     def reset_skills(self):
         for skill in self.skills:
             skill.level = 0
-
-    def trigger_skills(self, key: str, args: Dict[str, Any]):
-        for skill in self.skills:
-            if skill.level > 0 or skill.passive:
-                skill.trigger(key, args)

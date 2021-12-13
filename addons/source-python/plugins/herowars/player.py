@@ -36,12 +36,16 @@ class Player(easyplayer.Player):
     def _message(self, type_: type, message: str, **tokens: Dict[str, Any]):
         type_(message).send(self.index, **tokens)
 
-    def _init_hero(self):
+    def invoke_init_callbacks(self):
         if self.hero.type_object.init_callback is not None:
             self.hero.type_object.init_callback(self, self.hero)
         for skill in self.hero.skills:
             if skill.type_object.init_callback is not None:
                 skill.type_object.init_callback(self, self.hero, skill)
+
+    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
+        args['player'] = self
+        self.hero.invoke_callbacks(key, args)
 
     chat = partialmethod(_message, SayText2)
     info = partialmethod(_message, HintText)
