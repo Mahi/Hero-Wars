@@ -12,7 +12,7 @@ class Condemn:
         if chance(skill.current('chance')):
             duration = skill.current('duration')
             victim.freeze(duration)
-            skill.chat(victim, 'victim_message', duration=duration)
+            skill.send_string(victim, 'victim_message', duration=duration)
             skill.effect('beam', start_point=player.hip_location, end_point=victim.hip_location, life_time=duration)
             skill.effect('freeze', start_point=victim.origin, end_point=victim.eye_location, life_time=duration)
 
@@ -35,11 +35,11 @@ class Martyr:
 
         for player in PlayerIter(is_filters=[player.cs_team]):
             player.health += heal
-            skill.chat(player, 'teammate_message', heal=heal)
+            skill.send_string(player, 'teammate_message', heal=heal)
 
         attacker.take_damage(skill.current('damage'), attacker_index=player.index)
-        skill.chat(player, 'user_message', heal=heal, name=attacker.name, damage=damage)
-        skill.chat(attacker, 'killer_message', name=player.name, damage=damage)
+        skill.send_string(player, 'user_message', heal=heal, name=attacker.name, damage=damage)
+        skill.send_string(attacker, 'killer_message', name=player.name, damage=damage)
 
 
 class GodMode:
@@ -48,13 +48,11 @@ class GodMode:
         if skill.cooldown() <= 0:
             duration = skill.current('duration')
             player.godmode(duration)
-            skill.chat(player, 'start_message', duration=duration)
+            skill.send_string(player, 'start_message', duration=duration)
             old_color = player.color
             player.color = Color(255, 255, 0)
             Delay(duration, GodMode._end_ultimate, (skill, player, old_color))
-        else:
-            skill.chat_cooldown(player)
 
     def _end_ultimate(skill, player, color):
         player.color = color
-        skill.chat(player, 'end_message')
+        skill.send_string(player, 'end_message')

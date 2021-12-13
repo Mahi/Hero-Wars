@@ -10,7 +10,7 @@ class HeavyWeaponry:
             for weapon in WeaponClassIter()
             if weapon.name not in ('weapon_knife', 'weapon_deagle', 'weapon_m249', 'weapon_c4')
         ))
-        skill.chat(player, 'message', slow=skill.current('slow'))
+        skill.send_string(player, 'message', slow=skill.current('slow'))
         player.give_named_item('weapon_deagle')
 
 
@@ -19,7 +19,7 @@ class TitaniumBullets:
     def pre_player_attack(skill, player, take_damage_info, **eargs):
         damage = int(take_damage_info.damage * (1 + skill.current('damage') / 100))
         take_damage_info.damage += damage
-        skill.chat(player, 'message', damage=damage)
+        skill.send_string(player, 'message', damage=damage)
 
 
 class SteelArmor:
@@ -30,13 +30,13 @@ class SteelArmor:
     def player_spawn(skill, player, **eargs):
         player.max_health += skill.current('health')
         player.health += skill.current('health')
-        skill.chat(player, 'spawn_message', health=skill.current('health'))
+        skill.send_string(player, 'spawn_message', health=skill.current('health'))
     
     def pre_player_victim(skill, player, take_damage_info, **eargs):
         if skill._hit_count < skill.current('blocks'):
             skill._hit_count += 1
         else:
-            skill.chat(player, 'block_message', damage=int(take_damage_info.damage))
+            skill.send_string(player, 'block_message', damage=int(take_damage_info.damage))
             take_damage_info.damage = 0
             skill._hit_count = 0
 
@@ -56,9 +56,9 @@ class RocketBoosters:
             if skill.cooldown() <= 0:
                 skill._fly = player.fly()
                 skill.cooldown('off_cooldown')
-                skill.chat(player, 'description')
+                skill.send_string(player, 'description')
         elif skill.cooldown('off_cooldown') <= 0:
             skill._fly.cancel()
             skill._fly = None
             skill.cooldown()
-            skill.chat(player, 'end_message')
+            skill.send_string(player, 'end_message')

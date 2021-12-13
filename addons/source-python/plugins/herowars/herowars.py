@@ -3,93 +3,86 @@
 from commands import CommandReturn
 from commands.client import ClientCommand
 from commands.say import SayCommand
-from entities import TakeDamageInfo
-from entities.helpers import index_from_pointer
-from entities.hooks import EntityCondition
-from entities.hooks import EntityPreHook
-from events import Event
-from memory import make_object
 from messages.colors.saytext2 import GREEN, WHITE
 
 # Hero-Wars imports
 from . import database, menus, strings
-from .constants import DUO_PLAYER_EVENTS, SOLO_PLAYER_EVENTS, XP_ON_KILL
-from .listeners import OnHeroLevelUp, OnPlayerChangeHero
+from .constants import CUSTOM_PLAYER_EVENTS, XP_ON_KILL
+from .events import events
 from .players import player_dict
 
 
-# Invoke hero and skill callbacks
+# Messages and data management
 
-@Event(*SOLO_PLAYER_EVENTS)
-def _on_solo_player_event(game_event):
-    event_args = game_event.variables.as_dict()
-    player = player_dict.from_userid(event_args.pop('userid'))
-    player.invoke_callbacks(game_event.name, event_args)
+@events.on('player_change_hero')
+def _on_player_change_hero(player, new_hero, old_hero, **eargs):
+    if not player.dead:
+        player.slay()
 
+    database.save_hero_data(old_hero)
+    old_hero.skills.clear()
 
-@Event(*DUO_PLAYER_EVENTS.keys())
-def _on_duo_player_event(game_event):
-    event_args = game_event.variables.as_dict()
-    try:
-        attacker = player_dict.from_userid(event_args.pop('attacker'))
-    except KeyError:
-        attacker = None
-    victim = player_dict.from_userid(event_args.pop('userid'))
-    event_args.update(attacker=attacker, victim=victim)
-    victim_event, attacker_event = DUO_PLAYER_EVENTS[game_event.name]
-    victim.invoke_callbacks(victim_event, event_args)
-    if attacker is not None:
-        attacker.invoke_callbacks(attacker_event, event_args)
+    new_hero._create_skills()
+    database.load_skills_data(new_hero)
+    player.invoke_init_callbacks()
+
+    player.chat(strings.change_hero, hero_name=player.hero.name)
 
 
-@EntityPreHook(EntityCondition.is_player, 'on_take_damage')
-def _invoke_pre_damage_callbacks(args):
-    take_damage_info = make_object(TakeDamageInfo, args[1])
-    if not take_damage_info.attacker:
+@events.on('hero_level_up')
+def _on_hero_level_up(player, hero, **eargs):
+    player.chat(
+        strings.hero_info,
+        name=hero.name,
+        level=hero.level,
+        xp=hero.xp,
+        required_xp=hero.required_xp,
+    )
+
+
+@events.on('player_spawn')
+def _on_player_spawn(player, **eargs):
+    hero = player.hero
+    player.chat(
+        strings.hero_info,
+        name=hero.name,
+        level=hero.level,
+        xp=hero.xp,
+        required_xp=hero.required_xp,
+    )
+
+
+@events.on('player_death')
+def _on_death(victim, attacker, **eargs):
+    database.save_player_data(victim)
+
+    if attacker is None:
         return
-    attacker = player_dict[take_damage_info.attacker]
-    victim = player_dict[index_from_pointer(args[0])]
-    if victim.team == attacker.team:
-        return
-    event_args = {
-        'attacker': attacker,
-        'victim': victim,
-        'take_damage_info': take_damage_info,
-    }
-    attacker.invoke_callbacks('pre_player_attack', event_args)
-    victim.invoke_callbacks('pre_player_victim', event_args)
+
+    old_level = attacker.hero.level
+    attacker.hero.xp += XP_ON_KILL
+    attacker.chat(
+        strings.messages['Kill XP'],
+        color=GREEN,
+        white=WHITE,
+        xp=XP_ON_KILL,
+    )
+    if attacker.hero.level > old_level:
+        events['hero_level_up'].fire(
+            player=attacker,
+            hero=attacker.hero,
+            old_level=old_level,
+            new_level=attacker.hero.level,
+        )
 
 
-@ClientCommand('+ultimate')
-def _cmd_ultimate(command, player_index):
-    player = player_dict[player_index]
-    player.invoke_callbacks('player_ultimate', {})
-
-
-@ClientCommand('-ultimate')
-def _cmd_ultimate(command, player_index):
-    player = player_dict[player_index]
-    player.invoke_callbacks('player_ultimate_end', {})
-
-
-@ClientCommand('+ability')
-def _cmd_ability(command, player_index):
-    player = player_dict[player_index]
-    player.invoke_callbacks('player_ability', {})
-
-
-@ClientCommand('-ability')
-def _cmd_ability(command, player_index):
-    player = player_dict[player_index]
-    player.invoke_callbacks('player_ability_end', {})
-
-
-# Custom commands
+# Menu and operation commands
 
 @ClientCommand('hw_menu')
 @SayCommand(('!hw', '!herowars'))
 def _cmd_herowars_menu(command, player_index, team_only=None):
     menus.main.send(player_index)
+    return CommandReturn.BLOCK
 
 
 @ClientCommand('hw_heroinfo')
@@ -121,70 +114,13 @@ def _cmd_resetskills(command, player_index, team_only=None):
     return CommandReturn.BLOCK
 
 
-@OnPlayerChangeHero
-def _on_hero_change(player, **event_args):
-    if not player.dead:
-        player.slay()
+# Invoke hero and skill callbacks
+# This should stay at the bottom to ensure being called last
 
-    event_args['new_hero']._create_skills()
-    database.load_skills_data(event_args['new_hero'])
-    player.invoke_init_callbacks()
-    player.invoke_callbacks('player_change_hero', event_args)
-
-    database.save_hero_data(event_args['old_hero'])
-    event_args['old_hero'].skills.clear()
-
-    player.chat(strings.change_hero, hero_name=player.hero.name)
-
-
-@OnHeroLevelUp
-def _on_hero_level_up(player, **event_args):
-    player.invoke_callbacks('hero_level_up', event_args)
-    hero = player.hero
-    player.chat(
-        strings.hero_info,
-        name=hero.name,
-        level=hero.level,
-        xp=hero.xp,
-        required_xp=hero.required_xp,
-    )
-
-
-@Event('player_spawn')
-def _on_spawn(event):
-    player = player_dict.from_userid(event['userid'])
-    hero = player.hero
-    player.chat(
-        strings.hero_info,
-        name=hero.name,
-        level=hero.level,
-        xp=hero.xp,
-        required_xp=hero.required_xp,
-    )
-
-
-@Event('player_death')
-def _on_death(event):
-    victim = player_dict.from_userid(event['userid'])
-    database.save_player_data(victim)
-
-    try:
-        attacker = player_dict.from_userid(event['attacker'])
-    except KeyError:
-        return
-    old_level = attacker.hero.level
-    attacker.hero.xp += XP_ON_KILL
-    attacker.chat(
-        strings.messages['Kill XP'],
-        color=GREEN,
-        white=WHITE,
-        xp=XP_ON_KILL,
-    )
-    if attacker.hero.level > old_level:
-        OnHeroLevelUp.manager.notify(
-            player=attacker,
-            hero=attacker.hero,
-            old_level=old_level,
-            new_level=attacker.hero.level,
-        )
-
+@events.on(
+    'player_jump', 'player_spawn', 'player_kill', 'player_death', 'player_attack', 'player_victim',
+    *CUSTOM_PLAYER_EVENTS,
+    named=True,
+)
+def _invoke_callbacks(event_name, player, **eargs):
+    player.invoke_callbacks(event_name, eargs)

@@ -16,7 +16,7 @@ class Hero(Entity):
         self.skills = []
 
     def _create_skills(self) -> List[Skill]:
-        self.skills.extend([Skill(skill_type) for skill_type in self.type_object.skill_types])
+        self.skills.extend([Skill(skill_type) for skill_type in self._type_object.skill_types])
 
     @property
     def required_xp(self) -> int:
@@ -51,11 +51,11 @@ class Hero(Entity):
         if self.xp >= self.required_xp:
             self._xp = 0
 
-    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
-        args['hero'] = self
-        super().invoke_callbacks(key, args)
+    def invoke_callbacks(self, event_name: str, eargs: Dict[str, Any]):
+        eargs['hero'] = self
+        super().invoke_callbacks(event_name, eargs)
         for skill in self.skills:
-            skill.invoke_callbacks(key, args)
+            skill.invoke_callbacks(event_name, eargs)
 
     @property
     def skill_points(self) -> int:

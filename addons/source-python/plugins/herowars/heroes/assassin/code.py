@@ -23,7 +23,7 @@ class SharpBlade:
 class Leap:
 
     def player_spawn(skill, player, **rest):
-        skill.chat(player, 'spawn_message', longjump=skill.current('longjump'))
+        skill.send_string(player, 'spawn_message', longjump=skill.current('longjump'))
 
     def player_jump(skill, player, **rest):
         boost = 1 + skill.current('longjump') / 100

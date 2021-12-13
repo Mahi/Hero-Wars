@@ -37,15 +37,15 @@ class Player(easyplayer.Player):
         type_(message).send(self.index, **tokens)
 
     def invoke_init_callbacks(self):
-        if self.hero.type_object.init_callback is not None:
-            self.hero.type_object.init_callback(self, self.hero)
+        if self.hero._type_object.init_callback is not None:
+            self.hero._type_object.init_callback(self, self.hero)
         for skill in self.hero.skills:
-            if skill.type_object.init_callback is not None:
-                skill.type_object.init_callback(self, self.hero, skill)
+            if skill._type_object.init_callback is not None:
+                skill._type_object.init_callback(self, self.hero, skill)
 
-    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
-        args['player'] = self
-        self.hero.invoke_callbacks(key, args)
+    def invoke_callbacks(self, event_name: str, eargs: Dict[str, Any]):
+        eargs['player'] = self
+        self.hero.invoke_callbacks(event_name, eargs)
 
     chat = partialmethod(_message, SayText2)
     info = partialmethod(_message, HintText)

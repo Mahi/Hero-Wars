@@ -9,7 +9,6 @@ from messages.colors.saytext2 import ORANGE
 from . import strings
 from .entities import Hero
 from .hero_types import hero_types
-from .listeners import OnPlayerChangeHero
 from .player import Player
 from .players import player_dict
 from .utils import create_translation_string, split_translation_string
@@ -134,7 +133,7 @@ def _view_skills_build(menu: Menu, player: Player):
             skill_index += 1
             prefix = f'{skill_index}. '
             passive_text = ''
-        if 'player_ultimate' in skill.type_object.event_callbacks:
+        if 'player_ultimate' in skill.event_callbacks:
             ultimate_text = create_translation_string(' ({ultimate})', ultimate=strings.common['Ultimate'])
         else:
             ultimate_text = ''

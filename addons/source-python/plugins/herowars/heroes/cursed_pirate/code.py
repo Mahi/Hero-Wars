@@ -18,15 +18,15 @@ class Plunder:
             player.health += health
 
             skill.effect('beam', start_point=player.eye_location, end_point=victim.chest_location)
-            skill.chat(player, 'attacker_message', money=money, health=health)
-            skill.chat(victim, 'victim_message', money=money)
+            skill.send_string(player, 'attacker_message', money=money, health=health)
+            skill.send_string(victim, 'victim_message', money=money)
 
 
 class RaiseTheSails:
     
     def player_spawn(skill, player, **rest):
         player.speed += skill.current('speed') / 100
-        skill.chat(player, 'message', speed=skill.current('speed'))
+        skill.send_string(player, 'message', speed=skill.current('speed'))
 
 
 class Loot:
@@ -43,7 +43,7 @@ class Loot:
                 items[item] = True
                 player.give_named_item(f'weapon_{item}')
         if any(items.values()):
-            skill.chat(player, 'message', items=', '.join(item for item, give in items.items() if give))
+            skill.send_string(player, 'message', items=', '.join(item for item, give in items.items() if give))
 
 
 class _FinalCursePhase(Enum):
@@ -70,17 +70,17 @@ class FinalCurse:
             Delay(skill.current('duration'), FinalCurse._end_curse, (player, attacker.index, skill, godmode))
 
             skill.effect('ring', center=player.stomach_location)
-            skill.chat(player, 'start_message')
+            skill.send_string(player, 'start_message')
 
     def player_kill(player, skill, **eargs):
         if skill._phase == _FinalCursePhase.CURSED:
             skill._phase = _FinalCursePhase.SAVED
             player.color = Color(255, 255, 255)
-            skill.chat(player, 'success_message')
+            skill.send_string(player, 'success_message')
 
     def _end_curse(player, attacker_index, skill, godmode):
         godmode.cancel()
         if skill._phase == _FinalCursePhase.CURSED:
             player.color = Color(255, 255, 255)
             player.take_damage(player.health + 999, attacker_index=attacker_index, skip_hooks=True)
-            skill.chat(player, 'fail_message')
+            skill.send_string(player, 'fail_message')

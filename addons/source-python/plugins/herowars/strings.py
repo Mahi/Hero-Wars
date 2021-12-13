@@ -15,7 +15,6 @@ welcome = create_translation_string(
     welcome_str=messages['Welcome'],
 )
 
-
 hero_info = create_translation_string(
     f"{GREEN}{{name}} {WHITE}- {{level_str}}: {ORANGE}{{level}} ",
     f"{WHITE}- {{xp_str}}: {ORANGE}{{xp}}{WHITE}/{ORANGE}{{required_xp}}",

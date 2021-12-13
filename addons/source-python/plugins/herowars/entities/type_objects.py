@@ -9,11 +9,8 @@ from effects.base import TempEntity
 # Source.Python imports
 from translations.strings import TranslationStrings
 
-# Python imports
+# Hero-Wars imports
 from ..precache import get_model
-
-
-EventCallback = Callable[..., None]
 
 
 @dataclass
@@ -22,9 +19,13 @@ class EntityType:
     author: Optional[str] = None
     required_level: int = 0
     max_level: int = math.inf
+
     strings: Dict[str, TranslationStrings] = field(default_factory=dict)
-    init_callback: Optional[EventCallback] = None
-    event_callbacks: Dict[str, EventCallback] = field(default_factory=dict)
+    init_callback: Optional[Callable] = None
+    event_callbacks: Dict[str, Callable] = field(default_factory=dict)
+    effects: Dict[str, Any] = field(default_factory=dict)
+    temp_entities: Dict[str, TempEntity] = field(default_factory=dict)
+    variables: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def name(self) -> TranslationStrings:
@@ -34,6 +35,16 @@ class EntityType:
     def description(self) -> TranslationStrings:
         return self.strings['description']
 
+    def get_temp_entity(self, key: str) -> TempEntity:
+        if key not in self.temp_entities:
+            params = self.effects[key].copy()
+            del params['model']
+            name = params.pop('temp_entity')
+            self.temp_entities[key] = TempEntity(name, **params)
+        temp_entity = self.temp_entities[key]
+        temp_entity.model = temp_entity.halo = get_model(self.effects[key]['model'])
+        return temp_entity
+
 
 @dataclass
 class SkillType(EntityType):
@@ -41,19 +52,6 @@ class SkillType(EntityType):
     required_level: int = 1
     max_level: int = 8
     level_interval: int = 2
-    variables: Dict[str, Any] = field(default_factory=dict)
-    effects: Dict[str, Any] = field(default_factory=dict)
-    _temp_entities: Dict[str, TempEntity] = field(default_factory=dict)
-
-    def get_temp_entity(self, key: str) -> TempEntity:
-        if key not in self._temp_entities:
-            params = self.effects[key].copy()
-            del params['model']
-            name = params.pop('temp_entity')
-            self._temp_entities[key] = TempEntity(name, **params)
-        temp_entity = self._temp_entities[key]
-        temp_entity.model = temp_entity.halo = get_model(self.effects[key]['model'])
-        return temp_entity
 
 
 @dataclass

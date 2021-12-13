@@ -1,30 +1,25 @@
 # Site-Package imports
 from paths import PLUGIN_DATA_PATH, PLUGIN_PATH
 
+# Custom packages
+from easyevents import DUO_PLAYER_GAME_EVENT_MAP, SOLO_PLAYER_GAME_EVENTS
+
 # Hero-Wars imports
 from .utils import flatten
 
-SOLO_PLAYER_EVENTS = {
-    'player_spawn',
-    'player_disconnect',
-    'player_jump',
-}
 
 CUSTOM_PLAYER_EVENTS = {
     'player_ultimate',
+    'player_ultimate_end',
     'player_ability',
+    'player_ability_end',
     'player_change_hero',
     'hero_level_up',  # It's still an event with a player actor
     'pre_player_attack',
     'pre_player_victim',
 }
 
-DUO_PLAYER_EVENTS = {
-    'player_death': ('player_death', 'player_kill'),
-    'player_hurt': ('player_victim', 'player_attack'),
-}
-
-ALL_EVENTS = SOLO_PLAYER_EVENTS | CUSTOM_PLAYER_EVENTS | set(flatten(DUO_PLAYER_EVENTS.values()))
+ALL_EVENTS = CUSTOM_PLAYER_EVENTS | set(flatten(DUO_PLAYER_GAME_EVENT_MAP.values())) | SOLO_PLAYER_GAME_EVENTS
 
 
 # XP Values
