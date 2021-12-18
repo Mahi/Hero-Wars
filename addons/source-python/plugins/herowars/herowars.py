@@ -18,7 +18,7 @@ plugin_info = PluginInfo(
     name='herowars',
     verbose_name='Hero-Wars',
     author='Mahi',
-    version='0.0.1',
+    version='2.0.0_alpha',
     url='https://gitlab.com/Mahi/Hero-Wars',
 )
 ConVar('hw_version', plugin_info.version)
