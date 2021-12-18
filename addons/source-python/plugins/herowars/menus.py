@@ -8,6 +8,7 @@ from messages.colors.saytext2 import ORANGE
 # Hero-Wars imports
 from . import strings
 from .entities import Hero
+from .events import events
 from .hero_types import hero_types
 from .player import Player
 from .players import player_dict
@@ -22,13 +23,11 @@ def _menu(
     title: Optional[str]=None, 
     build_callback: Optional[BuildCallback]=None,
     select_callback: Optional[SelectCallback]=None,
-    parent: Optional[Menu]=None,
 ) -> Menu:
     return Menu(
         title=title,
         build_callback=_build(build_callback),
         select_callback=_select(select_callback),
-        parent_menu=parent,
     )
 
 
@@ -49,8 +48,9 @@ def _main_build(menu: Menu, player: Player):
     menu.description = player.hero.name
     menu.extend([
         Option(strings.menus['Change Hero'], change_hero),
-        Option(strings.menus['View Skills'], view_skills),
         Option(strings.menus['Upgrade Skills'], upgrade_skills),
+        Option(strings.menus['View Heroes'], view_heroes),
+        Option(strings.menus['View Skills'], view_skills),
         Option(strings.menus['Reset Skills'], 'RESET'),
     ])
 
@@ -63,7 +63,7 @@ def _main_select(menu: Menu, player: Player, choice: Any) -> Menu:
             unspent_message=strings.messages['Unspent Skill Points'],
         ))
         return menu
-
+    choice.value.parent = menu
     return choice.value
 
 
@@ -103,19 +103,33 @@ def _change_hero_select(menu: Menu, player: Player, choice: Any):
     if choice.value not in player.heroes:
         player.heroes[choice.value] = Hero(hero_types[choice.value])
     player.hero = player.heroes[choice.value]
-    OnPlayerChangeHero.manager.notify(
+    events['player_change_hero'].fire(
         player=player,
         old_hero=old_hero,
         new_hero=player.hero,
     )
 
 
+def _view_heroes_build(menu: Menu, player: Player):
+    for hero_type in hero_types.values():
+        menu.append(Option(hero_type.name, value=hero_type.key))
+    return menu
+
+
+def _view_heroes_select(menu: Menu, player: Player, choice: Any):
+    view_skills.parent = menu
+    view_skills.hero = hero_types[choice.value]
+    return view_skills
+
+
 def _view_skills_build(menu: Menu, player: Player):
-    menu.description = player.hero.name
+    if menu.hero is None:
+        menu.hero = player.hero
+    menu.description = menu.hero.name
     page = 0
     option_count = 0
     skill_index = 0
-    for skill in player.hero.skills:
+    for skill in menu.hero.skills:
         description = [
             Text(create_translation_string('  {row}', row=row))
             for row in split_translation_string(skill.description)
@@ -182,6 +196,8 @@ def _upgrade_skills_select(menu: Menu, player: Player, choice: Any):
 
 
 main = _menu('Hero-Wars', _main_build, _main_select)
-change_hero = _menu(strings.menus['Change Hero'], _change_hero_build, _change_hero_select, parent=main)
-view_skills = _menu(strings.menus['View Skills'], _view_skills_build, parent=main)
-upgrade_skills = _menu(strings.menus['Upgrade Skills'], _upgrade_skills_build, _upgrade_skills_select, parent=main)
+change_hero = _menu(strings.menus['Change Hero'], _change_hero_build, _change_hero_select)
+view_heroes = _menu(strings.menus['View Heroes'], _view_heroes_build, _view_heroes_select)
+view_skills = _menu(strings.menus['View Skills'], _view_skills_build)
+view_skills.hero = None
+upgrade_skills = _menu(strings.menus['Upgrade Skills'], _upgrade_skills_build, _upgrade_skills_select)

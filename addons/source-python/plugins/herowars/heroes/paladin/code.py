@@ -1,7 +1,6 @@
 from colors import Color
 from filters.players import PlayerIter
 from listeners.tick import Delay
-from mathlib import Vector
 
 from herowars.utils import chance
 

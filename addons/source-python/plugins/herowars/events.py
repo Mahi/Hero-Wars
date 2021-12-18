@@ -8,7 +8,7 @@ from entities.hooks import EntityPreHook
 from memory import make_object
 
 # Custom package imports
-from easyevents import EventManager
+from easyplayer import EventManager
 
 # Hero-Wars imports
 from .constants import CUSTOM_PLAYER_EVENTS
@@ -26,9 +26,9 @@ def _fire_pre_take_damage(args):
     take_damage_info = make_object(TakeDamageInfo, args[1])
     victim_index = index_from_pointer(args[0])
     victim = player_dict[victim_index]
-    if take_damage_info.attacker and take_damage_info.attacker != victim_index:
+    try:
         attacker = player_dict[take_damage_info.attacker]
-    else:
+    except (KeyError, ValueError):
         attacker = None
     event_args = {
         'attacker': attacker,

@@ -2,10 +2,7 @@
 from paths import PLUGIN_DATA_PATH, PLUGIN_PATH
 
 # Custom packages
-from easyevents import DUO_PLAYER_GAME_EVENT_MAP, SOLO_PLAYER_GAME_EVENTS
-
-# Hero-Wars imports
-from .utils import flatten
+from easyplayer.events import DEFAULT_GAME_EVENT_CONVERSIONS
 
 
 CUSTOM_PLAYER_EVENTS = {
@@ -14,24 +11,29 @@ CUSTOM_PLAYER_EVENTS = {
     'player_ability',
     'player_ability_end',
     'player_change_hero',
-    'hero_level_up',  # It's still an event with a player actor
+    'hero_level_up',
     'pre_player_attack',
     'pre_player_victim',
 }
 
-ALL_EVENTS = CUSTOM_PLAYER_EVENTS | set(flatten(DUO_PLAYER_GAME_EVENT_MAP.values())) | SOLO_PLAYER_GAME_EVENTS
 
+ALL_PLAYER_EVENTS = CUSTOM_PLAYER_EVENTS | {
+    conversion.event_name
+    for conversions in DEFAULT_GAME_EVENT_CONVERSIONS.values()
+    for conversion in conversions
+}
 
-# XP Values
 
 BASE_XP = 80
 XP_PER_LEVEL = 15
-XP_ON_KILL = 50
-BONUS_WEAPON_XP = {
-    # TODO
+XP_VALUES = {
+    'player_kill': 30,
+    'player_assist': 15,
+    'bomb_defused': 30,
+    'bomb_exploded': 20,
+    'bomb_planted': 20,
 }
 
-# Misc
 
 DEFAULT_HERO_KEY = None  # If None, use first hero (basically random)
 HEROES_PATH = PLUGIN_PATH / 'herowars' / 'heroes'

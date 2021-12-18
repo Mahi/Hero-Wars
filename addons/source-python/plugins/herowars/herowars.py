@@ -7,9 +7,10 @@ from messages.colors.saytext2 import GREEN, WHITE
 
 # Hero-Wars imports
 from . import database, menus, strings
-from .constants import CUSTOM_PLAYER_EVENTS, XP_ON_KILL
+from .constants import CUSTOM_PLAYER_EVENTS, XP_VALUES
 from .events import events
 from .players import player_dict
+from .utils import create_translation_string
 
 
 # Messages and data management
@@ -17,6 +18,24 @@ from .players import player_dict
 def unload():
     for player in player_dict.values():
         database.save_player_data(player)
+
+
+@events.on(*XP_VALUES.keys(), named=True)
+def _give_xp(event_name, player, **eargs):
+    old_level = player.hero.level
+    player.hero.xp += XP_VALUES[event_name]
+    if player.hero.level > old_level:
+        events['hero_level_up'].fire(
+            player=player,
+            hero=player.hero,
+            old_level=old_level,
+            new_level=player.hero.level,
+        )
+    player.chat(create_translation_string(
+        f'{GREEN}+{XP_VALUES[event_name]} {{xp_string}}{WHITE}: {{event_string}}',
+        xp_string=strings.common['XP'],
+        event_string=strings.messages[event_name],
+    ))
 
 
 @events.on('player_change_hero')
@@ -58,27 +77,10 @@ def _on_player_spawn(player, **eargs):
 
 
 @events.on('player_death')
-def _on_death(victim, attacker, **eargs):
+def _on_death(victim, **eargs):
     database.save_player_data(victim)
-
-    if attacker is None:
-        return
-
-    old_level = attacker.hero.level
-    attacker.hero.xp += XP_ON_KILL
-    attacker.chat(
-        strings.messages['Kill XP'],
-        color=GREEN,
-        white=WHITE,
-        xp=XP_ON_KILL,
-    )
-    if attacker.hero.level > old_level:
-        events['hero_level_up'].fire(
-            player=attacker,
-            hero=attacker.hero,
-            old_level=old_level,
-            new_level=attacker.hero.level,
-        )
+    if victim.hero.skill_points > 0 and any(skill.level < skill.max_level for skill in victim.hero.skills):
+        menus.upgrade_skills.send(victim.index)
 
 
 # Menu and operation commands
@@ -117,6 +119,14 @@ def _cmd_resetskills(command, player_index, team_only=None):
     )
     menus.upgrade_skills.send(player_index)
     return CommandReturn.BLOCK
+
+
+@ClientCommand('hw_changehero')
+@SayCommand('!changehero')
+def _cmd_changehero(command, player_index, team_only=None):
+    menus.change_hero.send(player_index)
+    return CommandReturn.BLOCK
+
 
 
 # Invoke hero and skill callbacks
