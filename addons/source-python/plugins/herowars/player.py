@@ -14,6 +14,7 @@ from .entities import Hero
 
 
 class Player(easyplayer.Player):
+    """Hero-Wars player class for managing player's heroes."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
