@@ -31,12 +31,15 @@ class Player(easyplayer.Player):
         self._hero = value
 
     def total_level(self) -> int:
+        """Get the total sum of all player's heroes."""
         return sum(hero.level for hero in self.heroes.values())
 
     def _message(self, type_: type, message: str, **tokens: Dict[str, Any]):
+        """Send a message of type to the player."""
         type_(message).send(self.index, **tokens)
 
     def invoke_init_callbacks(self):
+        """Invoke init callbacks for the current hero and its skills."""
         if self.hero._type_object.init_callback is not None:
             self.hero._type_object.init_callback(self, self.hero)
         for skill in self.hero.skills:
@@ -44,8 +47,13 @@ class Player(easyplayer.Player):
                 skill._type_object.init_callback(self, self.hero, skill)
 
     def invoke_callbacks(self, event_name: str, eargs: Dict[str, Any]):
-        eargs['player'] = self
-        self.hero.invoke_callbacks(event_name, eargs)
+        """Invoke event callbacks for the current hero and its skills."""
+        eargs = eargs.copy()  # Avoid accidentally modifying source dict
+        eargs.update({'player': self, 'hero': self.hero})
+        self.hero.invoke_callback(event_name, eargs)
+        for skill in self.hero.skills:
+            eargs['skill'] = skill
+            skill.invoke_callback(event_name, eargs)
 
     chat = partialmethod(_message, SayText2)
     info = partialmethod(_message, HintText)

@@ -9,6 +9,7 @@ from .skill import Skill
 
 
 class Hero(Entity):
+    """Hero entity manages skills and XP."""
 
     def __init__(self, *args, xp: int=0, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,6 +17,7 @@ class Hero(Entity):
         self.skills = []
 
     def _create_skills(self) -> List[Skill]:
+        """Create the skill entities from their type objects."""
         self.skills.extend([Skill(skill_type) for skill_type in self._type_object.skill_types])
 
     @property
@@ -53,18 +55,13 @@ class Hero(Entity):
         if self.xp >= self.required_xp:
             self._xp = 0
 
-    def invoke_callbacks(self, event_name: str, eargs: Dict[str, Any]):
-        eargs['hero'] = self
-        super().invoke_callbacks(event_name, eargs)
-        for skill in self.skills:
-            skill.invoke_callbacks(event_name, eargs)
-
     @property
     def skill_points(self) -> int:
         used_points = sum(skill.level for skill in self.skills)
         return self.level - used_points
 
     def can_upgrade_skill(self, skill: Skill) -> bool:
+        """Check if the hero can upgrade a particular skill."""
         return (
             self.skill_points > 0
             and skill.level < skill.max_level
@@ -74,8 +71,10 @@ class Hero(Entity):
         )
 
     def can_downgrade_skill(self, skill: Skill) -> bool:
+        """Check if the hero can downgrade a particular skill."""
         return skill.level > 0 and not skill.passive and skill in self.skills
 
     def reset_skills(self):
+        """Reset all hero's skills to level 0."""
         for skill in self.skills:
             skill.level = 0

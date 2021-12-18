@@ -14,7 +14,11 @@ class Skill(Entity):
     def next_required_level(self) -> int:
         return self.required_level + self.level_interval * self.level
 
-    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
-        args['skill'] = self
+    def invoke_callback(self, event_name: str, eargs: Dict[str, Any]):
+        """Invoke event callback for the skill.
+        
+        Ensures the skill can be invoked in the first place,
+        i.e. that the skill is a passive or has levels in it.
+        """
         if self.level > 0 or self.passive:
-            super().invoke_callbacks(key, args)
+            super().invoke_callback(event_name, eargs)

@@ -12,14 +12,19 @@ from .player import Player
 from .utils import first
 
 
-def _get_default_hero_type() -> HeroType:
+def get_starting_hero_type() -> HeroType:
+    """Get the starting hero type object for new players."""
     starting_hero_key = config.starting_hero.get_string()
     if not starting_hero_key:
         return first(hero_types)
     return hero_types[starting_hero_key]
 
 
-def _init_player(player_index: int) -> Player:
+def init_player(player_index: int) -> Player:
+    """Create and initialize a new player.
+
+    Intended to be used automatically by a PlayerDictionary.
+    """
     player = Player(player_index)
     exists = database.load_player_data(player)
     if not player.hero:
@@ -30,7 +35,7 @@ def _init_player(player_index: int) -> Player:
 
         # Give one hero by default
         else:
-            hero = Hero(_get_default_hero_type())
+            hero = Hero(get_starting_hero_type())
             player.heroes[hero.key] = hero
             player.hero = hero
 
@@ -50,4 +55,4 @@ def _init_player(player_index: int) -> Player:
     return player
 
 
-player_dict: Dict[str, Player] = PlayerDictionary(_init_player)
+player_dict: Dict[str, Player] = PlayerDictionary(init_player)

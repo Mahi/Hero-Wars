@@ -13,12 +13,20 @@ from .type_objects import EntityType
 
 
 def type_object_property(attr_name: str) -> property:
+    """Property that fetches the attribute from a type object."""
     def fget(self):
         return getattr(self._type_object, attr_name)
     return property(fget)
 
 
 class Entity:
+    """Base class for all Hero-Wars entities.
+
+    Implements leveling mechanics, type_object support,
+    event callbacks, visual effects, and more.
+
+    Requires an entity type object to function.
+    """
 
     def __init__(self, type_object: EntityType, level: int=0, *, db_id: Optional[int]=None):
         self._type_object = type_object
@@ -56,17 +64,24 @@ class Entity:
     def __repr__(self) -> str:
         return f'{type(self).__name__}(name="{self.name["en"]}", level={self.level}, db_id={self._db_id})'
 
-    def invoke_callbacks(self, key: str, args: Dict[str, Any]):
-        if key in self.event_callbacks:
-            self.event_callbacks[key](**args)
+    def invoke_callback(self, event_name: str, eargs: Dict[str, Any]):
+        """Invoke the event callback for an event, if any."""
+        if event_name in self.event_callbacks:
+            self.event_callbacks[event_name](**eargs)
 
     def effect(self, key: str='effect', recipients: Tuple[int]=(), **kwargs):
+        """Create a temp entity effect from an effect key.
+
+        Fetches the data from the temp_entities dictionary,
+        which in turn is populated from the effects dictionary.
+        """
         temp_entity = self._type_object.get_temp_entity(key)
         for name, attr in kwargs.items():
             setattr(temp_entity, name, attr)
         temp_entity.create(*recipients)
 
     def current(self, key: str) -> Any:
+        """Fetch a variable's value for the entity's current level."""
         raw = self.variables[key]
         if isinstance(raw, dict):
             if 'per_level' in raw:
@@ -78,12 +93,22 @@ class Entity:
         return raw
 
     def cooldown(self, key: str='cooldown') -> int:
+        """Manage an entity's cooldown.
+
+        The cooldown's maximum value is fetched from the variables dict.
+        If the cooldown hasn't been started yet, start it.
+        Return the remaining cooldown.
+        """
         value = self._cooldowns[key]
         if value <= 0:
             self._cooldowns[key] = self.current(key)
         return value
 
     def send_message(self, player_index: int, string: TranslationStrings, **tokens: Dict[str, Any]):
+        """Send a message to a player with the entity name as a prefix.
+
+        Also replace all the tokens with orange values.
+        """
         color_tokens = {
             key: f'{ORANGE}{value}{WHITE}'
             for key, value in tokens.items()
@@ -95,4 +120,8 @@ class Entity:
         )).send(player_index)
 
     def send_string(self, player_index: int, key: str, **tokens: Dict[str, Any]):
+        """Fetch and send a string from the entity's strings dictionary.
+
+        Calls send_message() with the fetched string.
+        """
         self.send_message(player_index, self.strings[key], **tokens)

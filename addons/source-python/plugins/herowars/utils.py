@@ -14,6 +14,7 @@ T = TypeVar('T')
 
 
 def first(dict: Dict[Any, T], default: Optional[T]=None) -> T:
+    """Fetch the first value from a dictionary."""
     try:
         return next(iter(dict.values()))
     except StopIteration:
@@ -21,12 +22,14 @@ def first(dict: Dict[Any, T], default: Optional[T]=None) -> T:
 
 
 def flatten(iterable: Iterable[Iterable[T]]) -> Iterable[T]:
+    """Flatten an iterable by one level."""
     for x in iterable:
         for y in x:
             yield y
 
 
 def dict_to_translation_strings(dict_: Dict[str, Any]) -> TranslationStrings:
+    """Convert a dict of strings to a dict of translation strings."""
     translation_strings = TranslationStrings()
     for language, string in dict_.items():
         translation_strings[language] = string
@@ -34,6 +37,7 @@ def dict_to_translation_strings(dict_: Dict[str, Any]) -> TranslationStrings:
 
 
 def dicts_to_translation_strings(dict_: Dict[str, Dict[str, Any]]) -> Dict[str, TranslationStrings]:
+    """Convert nested dicts of strings to nested dicts of translation strings."""
     return {
         key: dict_to_translation_strings(value)
         for key, value in dict_.items()
@@ -41,6 +45,10 @@ def dicts_to_translation_strings(dict_: Dict[str, Dict[str, Any]]) -> Dict[str, 
 
 
 def create_translation_string(*messages: Tuple[str], **tokens: Dict[str, Any]) -> TranslationStrings:
+    """Create a new translation string.
+
+    Makes it easier to create translation strings on-the-fly with f-strings.
+    """
     message = ''.join(messages)
     trs = TranslationStrings()
     for lang in language_manager.values():
@@ -50,6 +58,7 @@ def create_translation_string(*messages: Tuple[str], **tokens: Dict[str, Any]) -
 
 
 def split_translation_string(translation_string: TranslationStrings, separator: str='\n') -> List[TranslationStrings]:
+    """Split a TranslationString to multiple TranslationStrings."""
     result = []
     for lang, string in translation_string.items():
         parts = string.split(separator)
@@ -65,10 +74,17 @@ def split_translation_string(translation_string: TranslationStrings, separator: 
 
 
 def chance(percentage: int) -> bool:
+    """Compare a random chance to the given percentage."""
     return random.random() * 100 < percentage
 
 
 class CooldownDict(collections.defaultdict):
+    """Dictionary for managing cooldowns.
+
+    Automatically adds and subtracts time.time() from
+    the dictionary's values, making it seem like
+    the values are changing as the time progresses.
+    """
 
     def __init__(self, default_factory=int, *args, **kwargs):
         super().__init__(default_factory, *args, **kwargs)
