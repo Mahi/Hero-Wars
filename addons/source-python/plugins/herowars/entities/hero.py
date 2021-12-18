@@ -3,7 +3,7 @@ import math
 from typing import Any, Dict, List
 
 # Hero-Wars imports
-from ..constants import BASE_XP, XP_PER_LEVEL
+from .. import config
 from .entity import Entity
 from .skill import Skill
 
@@ -22,9 +22,11 @@ class Hero(Entity):
     def required_xp(self) -> int:
         if self.level >= self.max_level:
             return math.inf
+        base = config.xp_formula_base.get_int()
         if self.level <= 0:
-            return BASE_XP
-        return BASE_XP + self.level * XP_PER_LEVEL
+            return base
+        per_level = config.xp_formula_per_level.get_int()
+        return base + self.level * per_level
 
     @property
     def xp(self) -> int:

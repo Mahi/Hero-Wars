@@ -5,8 +5,7 @@ from typing import Dict
 from players.dictionary import PlayerDictionary
 
 # Hero-Wars imports
-from . import database, strings
-from .constants import DEFAULT_HERO_KEY
+from . import config, database, strings
 from .entities import Hero, HeroType
 from .hero_types import hero_types
 from .player import Player
@@ -14,9 +13,10 @@ from .utils import first
 
 
 def _get_default_hero_type() -> HeroType:
-    if DEFAULT_HERO_KEY is None:
+    starting_hero_key = config.starting_hero.get_string()
+    if not starting_hero_key:
         return first(hero_types)
-    return hero_types[DEFAULT_HERO_KEY]
+    return hero_types[starting_hero_key]
 
 
 def _init_player(player_index: int) -> Player:

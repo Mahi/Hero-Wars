@@ -11,11 +11,21 @@ from memory import make_object
 from easyplayer import EventManager
 
 # Hero-Wars imports
-from .constants import CUSTOM_PLAYER_EVENTS
 from .players import player_dict
 
 
 events = EventManager(player_dict)
+
+CUSTOM_PLAYER_EVENTS = {
+    'player_ultimate',
+    'player_ultimate_end',
+    'player_ability',
+    'player_ability_end',
+    'player_change_hero',
+    'hero_level_up',
+    'pre_player_attack',
+    'pre_player_victim',
+}
 
 for event_name in CUSTOM_PLAYER_EVENTS:
     events.create_event(event_name)

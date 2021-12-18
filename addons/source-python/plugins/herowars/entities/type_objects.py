@@ -33,7 +33,24 @@ class EntityType:
 
     @property
     def description(self) -> TranslationStrings:
+        self.strings['description'].tokens.update({
+            variable: self._variable_range_string(variable)
+            for variable in self.variables.keys()
+        })
         return self.strings['description']
+
+    def _variable_range_string(self, key: str) -> str:
+        raw = self.variables[key]
+        if isinstance(raw, dict):
+            if 'per_level' in raw:
+                base = raw.get('base', 0)
+                start = base + raw['per_level']
+                end = base + self.max_level * raw['per_level']
+                return f'{start} - {end}'
+        elif isinstance(raw, (list, tuple)):
+            if len(raw) == self.max_level:
+                return f'{raw[0]} - {raw[self.max_level - 1]}' 
+        return str(raw)
 
     def get_temp_entity(self, key: str) -> TempEntity:
         if key not in self.temp_entities:

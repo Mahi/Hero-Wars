@@ -32,6 +32,7 @@ class Entity:
     required_level: int = type_object_property('required_level')
     max_level: int = type_object_property('max_level')
     name: TranslationStrings = type_object_property('name')
+    description: TranslationStrings = type_object_property('description')
 
     strings: Dict[str, TranslationStrings] = type_object_property('strings')
     init_callback: Optional[Callable] = type_object_property('init_callback')
@@ -39,26 +40,6 @@ class Entity:
     effects: Dict[str, Any] = type_object_property('effects')
     temp_entities: Dict[str, TempEntity] = type_object_property('temp_entities')
     variables: Dict[str, Any] = type_object_property('variables')
-
-    @property
-    def description(self) -> TranslationStrings:
-        return self.strings['description'].tokenized(**{
-            variable: self._variable_range_string(variable)
-            for variable in self.variables.keys()
-        })
-
-    def _variable_range_string(self, key: str) -> str:
-        raw = self.variables[key]
-        if isinstance(raw, dict):
-            if 'per_level' in raw:
-                base = raw.get('base', 0)
-                start = base + raw['per_level']
-                end = base + self.max_level * raw['per_level']
-                return f'{start} - {end}'
-        elif isinstance(raw, (list, tuple)):
-            if len(raw) == self.max_level:
-                return f'{raw[0]} - {raw[self.max_level - 1]}' 
-        return str(raw)
 
     @property
     def level(self) -> int:

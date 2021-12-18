@@ -6,7 +6,7 @@ from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import bindparam
 
 # Hero-Wars imports
-from .constants import DATABASE_URL
+from . import config
 from .entities import Hero
 from .hero_types import hero_types
 from .player import Player
@@ -43,7 +43,14 @@ _t = _Tables(
 )
 
 
-engine = create_engine(URL(**DATABASE_URL))
+url_dict = {}
+for key, cvar in config.db_url.items():
+    value = cvar.get_string()
+    if not value:
+        value = None
+    url_dict[key] = value
+
+engine = create_engine(URL(**url_dict))
 _metadata.create_all(bind=engine)
 
 

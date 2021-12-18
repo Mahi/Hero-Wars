@@ -11,7 +11,7 @@ import yaml
 from path import Path
 
 # Hero-Wars imports
-from .constants import ALL_PLAYER_EVENTS, HEROES_PATH
+from . import config
 from .entities.type_objects import HeroType, SkillType
 from .utils import dicts_to_translation_strings
 
@@ -20,10 +20,10 @@ def _build_callbacks(obj: Any) -> Tuple[Callable, Callable]:
     init_callback = None
     event_callbacks = {}
     for name, attr in vars(obj).items():
-        if name in ALL_PLAYER_EVENTS:
-            event_callbacks[name] = attr
-        elif name == 'init':
+        if name == 'init':
             init_callback = attr
+        elif not name.startswith('_'):
+            event_callbacks[name] = attr
     return init_callback, event_callbacks
 
 
@@ -92,4 +92,4 @@ def _build_hero_type(path: Path) -> HeroType:
     )
 
 
-hero_types: Dict[str, HeroType] = _build_hero_types(HEROES_PATH)
+hero_types: Dict[str, HeroType] = _build_hero_types(Path(config.heroes_dir.get_string()))
