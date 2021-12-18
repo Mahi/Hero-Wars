@@ -23,7 +23,10 @@ You will need to install all the dependencies to your game server first:
     on Source.Python yet. Installation is equivalent to PyYAML:
    `py -3 -m pip install dataclasses -t [YOUR_CSGO_DIR]/csgo/addons/source-python/packages/site-packages`.
 
-Hopefully dependencies 3 and 4 will be included with Source.Python eventually, they're pretty useful :P
+_(Hopefully dependencies 3 and 4 will be included with Source.Python eventually)_
+
+Finally download and extract Hero-Wars to your CSGO directory.
+There are no GitHub releases yet, so you'll have to clone or download the repository.
 
 ## How to run?
 
