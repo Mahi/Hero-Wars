@@ -52,15 +52,18 @@ def _give_xp(event_name, player, **eargs):
 
 @events.on('player_change_hero')
 def _on_player_change_hero(player, new_hero, old_hero, **eargs):
-    if not player.dead:
-        player.slay()
-
     database.save_hero_data(old_hero)
     old_hero.skills.clear()
 
     new_hero._create_skills()
-    database.load_skills_data(new_hero)
+    if new_hero._db_id is None:
+        database.create_hero_data(new_hero, player.steamid)
+    else:
+        database.load_skills_data(new_hero)
     player.invoke_init_callbacks()
+
+    if not player.dead:
+        player.slay()
 
     player.chat(strings.change_hero, hero_name=player.hero.name)
 

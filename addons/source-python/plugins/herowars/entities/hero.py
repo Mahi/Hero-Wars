@@ -39,12 +39,12 @@ class Hero(Entity):
         self._xp = value
         try:
             while self.xp < 0:
-                self.level -= 1
+                self._level -= 1
                 self._xp += self.required_xp
 
             while self.xp >= self.required_xp:
                 self._xp -= self.required_xp
-                self.level += 1
+                self._level += 1
 
         except ValueError: # Invalid level value (<0 or >max_level)
             self._xp = 0

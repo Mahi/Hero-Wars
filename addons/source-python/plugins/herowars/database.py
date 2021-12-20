@@ -131,7 +131,7 @@ def create_hero_data(hero: Hero, steamid: str):
 
         skills = [skill for skill in hero.skills if not skill.passive]
         skills_result = conn.execute(
-            skills.insert().values([
+            _t.skill.insert().values([
                 {
                     'key': skill.key,
                     'level': skill.level,
