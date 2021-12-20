@@ -44,7 +44,7 @@ class Martyr:
 class GodMode:
 
     def player_ultimate(skill, player, **rest):
-        if skill.cooldown() <= 0:
+        if skill.off_cooldown():
             duration = skill.current('duration')
             player.godmode(duration)
             skill.send_string(player, 'start_message', duration=duration)
@@ -54,4 +54,6 @@ class GodMode:
 
     def _end_ultimate(skill, player, color):
         player.color = color
+        skill.start_cooldown()
+        skill.send_cooldown(player)
         skill.send_string(player, 'end_message')

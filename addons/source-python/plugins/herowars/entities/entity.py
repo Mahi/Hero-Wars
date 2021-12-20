@@ -1,14 +1,19 @@
 # Python imports
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+import collections
+import math
+from typing import Any, Callable, Dict, Optional, Tuple
 
 # Source.Python imports
 from effects.base import TempEntity
+from listeners.tick import Repeat
+from messages.base import HudMsg
 from messages.colors.saytext2 import GREEN, ORANGE, WHITE
 from messages import SayText2
+from players.entity import Player
 from translations.strings import TranslationStrings
 
 # Hero-Wars imports
-from ..utils import CooldownDict, create_translation_string
+from ..utils import Cooldown, create_translation_string
 from .type_objects import EntityType
 
 
@@ -33,7 +38,7 @@ class Entity:
         self._level = level
         self._db_id = db_id
         self._temp_entities: Dict[str, Tuple[TempEntity, str]] = {}
-        self._cooldowns = CooldownDict()
+        self._cooldowns = collections.defaultdict(Cooldown)
 
     key: str = type_object_property('key')
     author: Optional[str] = type_object_property('author')
@@ -92,19 +97,45 @@ class Entity:
             return raw[index]
         return raw
 
-    def cooldown(self, key: str='cooldown') -> int:
-        """Manage an entity's cooldown.
+    def off_cooldown(self, key: str='cooldown', auto_reserve=True) -> bool:
+        """Check if the skill's cooldown is off.
 
-        The cooldown's maximum value is fetched from the variables dict.
-        If the cooldown hasn't been started yet, start it.
-        Return the remaining cooldown.
+        If set to `auto_reserve`, the cooldown will be reserved
+        automatically if it's off-cooldown.
         """
-        value = self._cooldowns[key]
-        if value <= 0:
-            self._cooldowns[key] = self.current(key)
-        return value
+        cooldown = self._cooldowns[key]
+        off = cooldown.remaining <= 0
+        if off and auto_reserve:
+            cooldown.reserve()
+        return off
 
-    def send_message(self, player_index: int, string: TranslationStrings, **tokens: Dict[str, Any]):
+    def start_cooldown(self, key: str='cooldown') -> Cooldown:
+        """Start a cooldown for an entity.
+
+        Returns the started cooldown.
+        """
+        duration = self.current(key)
+        cooldown = self._cooldowns[key]
+        cooldown.start(duration)
+        return cooldown
+
+    def send_cooldown(self, player: Player, key: str='cooldown'):
+        """Send a cooldown HudMsg to a player."""
+        hud_msg = HudMsg('{remaining}', y=0.9, hold_time=1)
+        repeat = Repeat(self._send_cooldown_tick, cancel_on_level_end=True)
+        repeat.args = (hud_msg, player.index, key, repeat)
+        repeat.start(1)
+
+    def _send_cooldown_tick(self, hud_msg: HudMsg, player_index: int, key: str, repeat: Repeat):
+        """Send one tick of the cooldown to a player."""
+        remaining = math.ceil(self._cooldowns[key].remaining)
+        if remaining > 0:
+            hud_msg.send(player_index, remaining=remaining)
+        else:
+            hud_msg.send(player_index, remaining='')  # Empty message clears the HudMsg
+            repeat.stop()
+
+    def send_message(self, player: Player, string: TranslationStrings, **tokens: Dict[str, Any]):
         """Send a message to a player with the entity name as a prefix.
 
         Also replace all the tokens with orange values.
@@ -117,11 +148,11 @@ class Entity:
             f'[{GREEN}{{name}}{WHITE}] {{message}}',
             name=self.name,
             message=string.tokenized(**color_tokens),
-        )).send(player_index)
+        )).send(player.index)
 
-    def send_string(self, player_index: int, key: str, **tokens: Dict[str, Any]):
+    def send_string(self, player: Player, key: str, **tokens: Dict[str, Any]):
         """Fetch and send a string from the entity's strings dictionary.
 
         Calls send_message() with the fetched string.
         """
-        self.send_message(player_index, self.strings[key], **tokens)
+        self.send_message(player, self.strings[key], **tokens)

@@ -1,5 +1,5 @@
 # Python imports
-import collections
+import math
 import random
 import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple, TypeVar
@@ -78,19 +78,32 @@ def chance(percentage: int) -> bool:
     return random.random() * 100 < percentage
 
 
-class CooldownDict(collections.defaultdict):
-    """Dictionary for managing cooldowns.
+class Cooldown:
+    """A cooldown whose value lowers with time."""
 
-    Automatically adds and subtracts time.time() from
-    the dictionary's values, making it seem like
-    the values are changing as the time progresses.
-    """
+    def __init__(self, value: float=0.0):
+        self._value = value + time.time()
+        self._reserved = False
 
-    def __init__(self, default_factory=int, *args, **kwargs):
-        super().__init__(default_factory, *args, **kwargs)
+    @property
+    def remaining(self) -> float:
+        if self._reserved:
+            return math.inf
+        return max(self._value - time.time(), 0)
 
-    def __getitem__(self, key):
-        return super().__getitem__(key) - time.time()
+    @remaining.setter
+    def remaining(self, value: float):
+        self._value = value + time.time()
 
-    def __setitem__(self, key, value):
-        return super().__setitem__(key, value + time.time())
+    def reserve(self):
+        """Flag the cooldown as 'reserved'.
+
+        The cooldown will be flagged as if it were already on-cooldown,
+        without actually starting the cooldown.
+        """
+        self._reserved = True
+
+    def start(self, duration: float):
+        """Start the cooldown."""
+        self._reserved = False
+        self.remaining = duration
