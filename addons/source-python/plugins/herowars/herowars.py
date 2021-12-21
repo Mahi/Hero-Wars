@@ -1,3 +1,6 @@
+# Python imports
+import functools
+
 # Source-Python imports
 from commands import CommandReturn
 from commands.client import ClientCommand
@@ -98,18 +101,20 @@ def _on_death(victim, **eargs):
         menus.upgrade_skills.send(victim.index)
 
 
-# Menu and operation commands
+# Menus and commands
 
-@ClientCommand('hw_menu')
-@SayCommand(('!hw', '!herowars'))
-def _cmd_herowars_menu(command, player_index, team_only=None):
-    menus.main.send(player_index)
-    return CommandReturn.BLOCK
+def _cmd_resetskills(player_index):
+    player = player_dict[player_index]
+    player.hero.reset_skills()
+    player.chat(
+        strings.unspent_skill_points,
+        hero_name=player.hero.name,
+        skill_points=player.hero.skill_points
+    )
+    menus.upgrade_skills.send(player_index)
 
 
-@ClientCommand('hw_heroinfo')
-@SayCommand('!heroinfo')
-def _cmd_heroinfo(command, player_index, team_only=None):
+def _cmd_heroinfo(player_index):
     player = player_dict[player_index]
     hero = player.hero
     player.chat(
@@ -119,28 +124,26 @@ def _cmd_heroinfo(command, player_index, team_only=None):
         xp=hero.xp,
         required_xp=hero.required_xp,
     )
+
+
+_commands = (
+    # (clientcommand, (saycommands,), callback),
+    ('hw_menu', ('!hw', '!herowars'), menus.main.send),
+    ('hw_changehero', ('!ch', '!changehero'), menus.change_hero.send),
+    ('hw_upgradeskills', ('!us', '!upgradeskills'), menus.upgrade_skills.send),
+    ('hw_resetskills', ('!rs', '!resetskills'), _cmd_resetskills),
+    ('hw_heroinfo', ('!hi', '!heroinfo'), _cmd_heroinfo),
+)
+
+def _run_command(callback, command, player_index, team_only=None):
+    callback(player_index)
     return CommandReturn.BLOCK
 
 
-@ClientCommand('hw_resetskills')
-@SayCommand('!resetskills')
-def _cmd_resetskills(command, player_index, team_only=None):
-    player = player_dict[player_index]
-    player.hero.reset_skills()
-    player.chat(
-        strings.unspent_skill_points,
-        hero_name=player.hero.name,
-        skill_points=player.hero.skill_points
-    )
-    menus.upgrade_skills.send(player_index)
-    return CommandReturn.BLOCK
-
-
-@ClientCommand('hw_changehero')
-@SayCommand('!changehero')
-def _cmd_changehero(command, player_index, team_only=None):
-    menus.change_hero.send(player_index)
-    return CommandReturn.BLOCK
+for client_cmd, say_cmds, callback in _commands:
+    _cmd = functools.partial(_run_command, callback)
+    _cmd = ClientCommand(client_cmd)(_cmd)
+    _cmd = SayCommand(say_cmds)(_cmd)
 
 
 
