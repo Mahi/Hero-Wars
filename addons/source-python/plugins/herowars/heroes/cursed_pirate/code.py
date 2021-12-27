@@ -1,7 +1,7 @@
 from enum import Enum
 
 from listeners.tick import Delay
-from colors import Color
+from colors import Color, RED
 
 from herowars.utils import chance
 
@@ -70,7 +70,10 @@ class FinalCurse:
             Delay(skill.current('duration'), FinalCurse._end_curse, (player, attacker.index, skill, godmode))
 
             skill.effect('ring', center=player.stomach_location)
-            skill.send_string(player, 'start_message')
+            player.display(
+                skill.strings['start_hud_message'],
+                message_kwargs={'color1': RED, 'y': 0.5},
+            )
 
     def player_kill(player, skill, **eargs):
         if skill._phase == _FinalCursePhase.CURSED:

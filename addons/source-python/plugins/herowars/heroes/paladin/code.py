@@ -32,7 +32,7 @@ class Martyr:
         damage = int(skill.current('damage'))
         heal = skill.current('heal')
 
-        for player in PlayerIter(is_filters=[player.cs_team]):
+        for player in PlayerIter(is_filters=[player.team_name]):
             player.health += heal
             skill.send_string(player, 'teammate_message', heal=heal)
 
