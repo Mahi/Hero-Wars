@@ -14,7 +14,7 @@ class Hero(Entity):
     def __init__(self, *args, xp: int=0, **kwargs):
         super().__init__(*args, **kwargs)
         self._xp = xp
-        self.skills = []
+        self.skills: List[Skill] = []
 
     def _create_skills(self) -> List[Skill]:
         """Create the skill entities from their type objects."""
@@ -63,16 +63,20 @@ class Hero(Entity):
     def can_upgrade_skill(self, skill: Skill) -> bool:
         """Check if the hero can upgrade a particular skill."""
         return (
-            self.skill_points > 0
-            and skill.level < skill.max_level
-            and skill.next_required_level <= self.level
+            skill.level < skill.max_level
             and not skill.passive
+            and self.skill_points > 0
+            and skill.next_required_level <= self.level
             and skill in self.skills
         )
 
     def can_downgrade_skill(self, skill: Skill) -> bool:
         """Check if the hero can downgrade a particular skill."""
-        return skill.level > 0 and not skill.passive and skill in self.skills
+        return (
+            skill.level < skill.max_level
+            and not skill.passive
+            and skill in self.skills
+        )
 
     def reset_skills(self):
         """Reset all hero's skills to level 0."""

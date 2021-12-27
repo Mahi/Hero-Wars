@@ -8,13 +8,13 @@ from entities.hooks import EntityPreHook
 from memory import make_object
 
 # Custom package imports
-from easyplayer import EventManager
+from easyevents import EasyEvents
 
 # Hero-Wars imports
 from .players import player_dict
 
 
-events = EventManager(player_dict)
+events = EasyEvents(player_dict)
 
 CUSTOM_PLAYER_EVENTS = {
     'player_ultimate',

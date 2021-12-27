@@ -1,6 +1,6 @@
 # Site-Package imports
 from dataclasses import dataclass
-from sqlalchemy import create_engine, Column, ForeignKey, Integer, MetaData, Table, Text
+from sqlalchemy import Boolean, create_engine, Column, ForeignKey, Integer, MetaData, Table, Text
 from sqlalchemy.engine.url import URL
 from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import bindparam
@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import bindparam
 from . import config
 from .entities import Hero
 from .hero_types import hero_types
-from .player import Player
+from .player import Player, UpgradeSkillsPopup
 
 
 _metadata = MetaData()
@@ -26,6 +26,9 @@ _t = _Tables(
     player=Table('player', _metadata,
         Column('steamid', Text, primary_key=True),
         Column('hero_id', Integer, ForeignKey('hero.id')),
+        # Player Settings
+        Column('inspect_to_ult', Boolean, nullable=False, default=True),
+        Column('upgrade_skills_popup', Integer, nullable=False, default=1),
     ),
     hero=Table('hero', _metadata,
         Column('id', Integer, primary_key=True),
@@ -57,7 +60,10 @@ _metadata.create_all(bind=engine)
 def create_player_data(player: Player):
     with engine.connect() as conn:
         conn.execute(
-            _t.player.insert().values(steamid=player.steamid)
+            _t.player.insert().values(
+                steamid=player.steamid,
+                inspect_to_ult=player.settings.inspect_to_ult,
+            )
         )
 
         create_hero_data(player.hero, steamid=player.steamid)
@@ -77,6 +83,8 @@ def load_player_data(player: Player) -> bool:
         player_info = player_result.first()
         if player_info is None:
             return False
+        player.settings.inspect_to_ult = player_info.inspect_to_ult
+        player.settings.upgrade_skills_popup = UpgradeSkillsPopup(player_info.upgrade_skills_popup)
 
         heroes_result = conn.execute(
             select([_t.hero]).where(_t.player.c.steamid==player.steamid)
@@ -112,7 +120,11 @@ def save_player_data(player: Player):
         conn.execute(
             _t.player.update()\
                 .where(_t.player.c.steamid==player.steamid)\
-                .values(hero_id=player.hero._db_id)
+                .values(
+                    hero_id=player.hero._db_id,
+                    inspect_to_ult=player.settings.inspect_to_ult,
+                    upgrade_skills_popup=player.settings.upgrade_skills_popup.value,
+                )
         )
         save_hero_data(player.hero)
 

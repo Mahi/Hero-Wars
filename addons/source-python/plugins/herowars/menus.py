@@ -10,7 +10,7 @@ from . import strings
 from .entities import Hero
 from .events import events
 from .hero_types import hero_types
-from .player import Player
+from .player import Player, UpgradeSkillsPopup
 from .players import player_dict
 from .utils import create_translation_string, split_translation_string
 
@@ -52,6 +52,7 @@ def _main_build(menu: Menu, player: Player):
         Option(strings.menus['View Skills'], view_skills),
         Option(strings.menus['Upgrade Skills'], upgrade_skills),
         Option(strings.menus['Reset Skills'], 'RESET'),
+        Option(strings.menus['Player Settings'], player_settings),
     ])
 
 
@@ -195,9 +196,37 @@ def _upgrade_skills_select(menu: Menu, player: Player, choice: Any):
     return menu
 
 
+def _player_settings_build(menu: Menu, player: Player):
+    menu.append(Option(
+        create_translation_string(
+            f'{{field_string}}: {{value_string}}',
+            field_string=strings.menus['Inspect To Ult'],
+            value_string=strings.common['Yes' if player.settings.inspect_to_ult else 'No'] 
+       ),
+       ('inspect_to_ult', not player.settings.inspect_to_ult),
+    ))
+
+    next_setting = UpgradeSkillsPopup((player.settings.upgrade_skills_popup.value + 1) % len(UpgradeSkillsPopup))
+    menu.append(Option(
+        create_translation_string(
+            f'{{field_string}}: {{value_string}}',
+            field_string=strings.menus['Upgrade Skills Popup'],
+            value_string=strings.menus[f'Upgrade Skills Value {player.settings.upgrade_skills_popup.value}'],
+        ),
+        ('upgrade_skills_popup', next_setting)
+    ))
+
+
+def _player_settings_select(menu: Menu, player: Player, choice: Any):
+    attr, value = choice.value
+    setattr(player.settings, attr, value)
+    return menu
+
+
 main = _menu('Hero-Wars', _main_build, _main_select)
 view_heroes = _menu(strings.menus['View Heroes'], _view_heroes_build, _view_heroes_select)
 change_hero = _menu(strings.menus['Change Hero'], _change_hero_build, _change_hero_select)
 view_skills = _menu(strings.menus['View Skills'], _view_skills_build)
 view_skills.hero_type = None
 upgrade_skills = _menu(strings.menus['Upgrade Skills'], _upgrade_skills_build, _upgrade_skills_select)
+player_settings = _menu(strings.menus['Player Settings'], _player_settings_build, _player_settings_select)
